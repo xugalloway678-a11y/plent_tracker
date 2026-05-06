@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gardener Dashboard</title>
+</head>
+<body>
+    <h1>Gardener Dashboard</h1>
+
+    <p>Welcome, {{ username }}!</p>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <h2>Quick Actions</h2>
+
+    <p><a href="/plants/add">Add New Plant</a></p>
+    <p><a href="/my-plants">My Plants</a></p>
+    <p><a href="/gallery">Public Plant Gallery</a></p>
+    <p><a href="/logout">Logout</a></p>
+
+    <h2>Recent Activities</h2>
+    <p>No recent activities yet.</p>
+</body>
+</html>

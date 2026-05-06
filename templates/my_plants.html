@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Plants</title>
+</head>
+<body>
+    <h1>My Plants</h1>
+
+    <p>Welcome, {{ username }}!</p>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <p>
+        <a href="/plants/add">Add New Plant</a> |
+        <a href="/gardener/dashboard">Dashboard</a> |
+        <a href="/logout">Logout</a>
+    </p>
+
+    {% if plants %}
+        <table border="1" cellpadding="8">
+            <tr>
+                <th>Name</th>
+                <th>Species</th>
+                <th>Type</th>
+                <th>Health Status</th>
+                <th>Water Frequency</th>
+                <th>Privacy</th>
+                <th>Actions</th>
+            </tr>
+
+            {% for plant in plants %}
+            <tr>
+                <td>{{ plant.name }}</td>
+                <td>{{ plant.species }}</td>
+                <td>{{ plant.plant_type }}</td>
+                <td>{{ plant.health_status }}</td>
+                <td>Every {{ plant.water_frequency_days }} days</td>
+                <td>
+                    {% if plant.is_public %}
+                        Public
+                    {% else %}
+                        Private
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/plants/{{ plant.plant_id }}">View Details</a> |
+                    <a href="/plants/{{ plant.plant_id }}/edit">Edit</a> |
+                    <form method="POST" action="/plants/{{ plant.plant_id }}/water" style="display:inline;">
+                        <button type="submit">Water</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>You have not added any plants yet.</p>
+    {% endif %}
+</body>
+</html>

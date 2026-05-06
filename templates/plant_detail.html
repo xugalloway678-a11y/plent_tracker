@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plant Detail</title>
+</head>
+<body>
+    <h1>Plant Detail</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <p>
+        <a href="/my-plants">Back to My Plants</a> |
+        <a href="/gardener/dashboard">Dashboard</a> |
+        <a href="/logout">Logout</a>
+    </p>
+
+    <h2>{{ plant.name }}</h2>
+
+    <p><strong>Species:</strong> {{ plant.species }}</p>
+    <p><strong>Type:</strong> {{ plant.plant_type }}</p>
+    <p><strong>Water Frequency:</strong> Every {{ plant.water_frequency_days }} days</p>
+    <p><strong>Sunlight:</strong> {{ plant.sunlight }}</p>
+    <p><strong>Difficulty:</strong> {{ plant.difficulty }}</p>
+    <p><strong>Health Status:</strong> {{ plant.health_status }}</p>
+    <p>
+        <strong>Privacy:</strong>
+        {% if plant.is_public %}
+            Public
+        {% else %}
+            Private
+        {% endif %}
+    </p>
+
+    <h2>Quick Action</h2>
+
+    <form method="POST" action="/plants/{{ plant.plant_id }}/water">
+        <button type="submit">Mark as Watered</button>
+    </form>
+
+    <h2>Add Care Activity</h2>
+
+    <form method="POST" action="/plants/{{ plant.plant_id }}/activities/add">
+        <label>Activity Type:</label><br>
+        <select name="activity_type">
+            <option value="Watering">Watering</option>
+            <option value="Fertilizing">Fertilizing</option>
+            <option value="Pruning">Pruning</option>
+            <option value="Repotting">Repotting</option>
+            <option value="Inspection">Inspection</option>
+            <option value="Other">Other</option>
+        </select><br><br>
+
+        <label>Notes:</label><br>
+        <textarea name="notes" rows="4" cols="40"></textarea><br><br>
+
+        <label>Activity Date:</label><br>
+        <input type="datetime-local" name="activity_date"><br><br>
+
+        <button type="submit">Add Activity</button>
+    </form>
+
+    <h2>Care History</h2>
+
+    {% if activities %}
+        <ul>
+            {% for activity in activities %}
+                <li>
+                    <strong>{{ activity.activity_type }}</strong>
+                    - {{ activity.activity_date }}
+                    <br>
+                    Notes: {{ activity.notes }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No care activities recorded yet.</p>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Plant Care Tracker</title>
+</head>
+<body>
+    <h1>Login</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="/login">
+        <label>Role:</label><br>
+        <select name="role">
+            <option value="gardener">Gardener</option>
+            <option value="admin">Admin</option>
+        </select><br><br>
+
+        <label>Username:</label><br>
+        <input type="text" name="username"><br><br>
+
+        <label>Password:</label><br>
+        <input type="password" name="password"><br><br>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <p>First time here? <a href="/register">Register here</a></p>
+    <p><a href="/">Back to Home</a></p>
+</body>
+</html>

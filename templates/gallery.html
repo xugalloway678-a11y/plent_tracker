@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Public Plant Gallery</title>
+</head>
+<body>
+    <h1>Public Plant Gallery</h1>
+
+    <p>
+        <a href="/">Home</a> |
+        <a href="/login">Login</a> |
+        <a href="/register">Register</a>
+    </p>
+
+    <h2>Search and Filter</h2>
+
+    <form method="GET" action="/gallery">
+        <label>Search by plant name:</label><br>
+        <input type="text" name="search" value="{{ search }}"><br><br>
+
+        <label>Plant Type:</label><br>
+        <select name="plant_type">
+            <option value="">All</option>
+            <option value="indoor" {% if plant_type == 'indoor' %}selected{% endif %}>Indoor</option>
+            <option value="outdoor" {% if plant_type == 'outdoor' %}selected{% endif %}>Outdoor</option>
+        </select><br><br>
+
+        <label>Sunlight:</label><br>
+        <select name="sunlight">
+            <option value="">All</option>
+            <option value="Full Sun" {% if sunlight == 'Full Sun' %}selected{% endif %}>Full Sun</option>
+            <option value="Partial Sun" {% if sunlight == 'Partial Sun' %}selected{% endif %}>Partial Sun</option>
+            <option value="Full Shade" {% if sunlight == 'Full Shade' %}selected{% endif %}>Full Shade</option>
+            <option value="Indirect Light" {% if sunlight == 'Indirect Light' %}selected{% endif %}>Indirect Light</option>
+            <option value="Low Light" {% if sunlight == 'Low Light' %}selected{% endif %}>Low Light</option>
+        </select><br><br>
+
+        <label>Difficulty:</label><br>
+        <select name="difficulty">
+            <option value="">All</option>
+            <option value="Easy" {% if difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+            <option value="Moderate" {% if difficulty == 'Moderate' %}selected{% endif %}>Moderate</option>
+            <option value="Challenging" {% if difficulty == 'Challenging' %}selected{% endif %}>Challenging</option>
+        </select><br><br>
+
+        <button type="submit">Search</button>
+        <a href="/gallery">Reset</a>
+    </form>
+
+    <h2>Public Plants</h2>
+
+    {% if plants %}
+        <div>
+            {% for plant in plants %}
+                <div style="border: 1px solid #333; padding: 10px; margin: 10px;">
+                    <h3>{{ plant.name }}</h3>
+                    <p><strong>Species:</strong> {{ plant.species }}</p>
+                    <p><strong>Type:</strong> {{ plant.plant_type }}</p>
+                    <p><strong>Sunlight:</strong> {{ plant.sunlight }}</p>
+                    <p><strong>Difficulty:</strong> {{ plant.difficulty }}</p>
+                    <p><strong>Health:</strong> {{ plant.health_status }}</p>
+                    <a href="/public/plants/{{ plant.plant_id }}">View Details</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No public plants found.</p>
+    {% endif %}
+</body>
+</html>

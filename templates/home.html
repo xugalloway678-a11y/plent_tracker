@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plant Care Tracker</title>
+</head>
+<body>
+    <h1>Plant Care Tracker</h1>
+
+    <p>
+        A web-based system for gardeners to manage plants, record care activities,
+        and share public plant information with visitors.
+    </p>
+
+    <hr>
+
+    <h2>System Overview</h2>
+    <p>Total Gardeners: {{ total_gardeners }}</p>
+    <p>Total Plants: {{ total_plants }}</p>
+    <p>Public Plants: {{ public_plants }}</p>
+
+    <hr>
+
+    <h2>Navigation</h2>
+
+    <p><a href="/gallery">Public Plant Gallery</a></p>
+
+    {% if username %}
+        <p>Logged in as: {{ username }} ({{ role }})</p>
+
+        {% if role == "gardener" %}
+            <p><a href="/gardener/dashboard">Go to Gardener Dashboard</a></p>
+            <p><a href="/my-plants">My Plants</a></p>
+            <p><a href="/plants/add">Add New Plant</a></p>
+        {% elif role == "admin" %}
+            <p><a href="/admin/dashboard">Go to Admin Dashboard</a></p>
+            <p><a href="/admin/users">User Management</a></p>
+        {% endif %}
+
+        <p><a href="/logout">Logout</a></p>
+    {% else %}
+        <p><a href="/login">Login</a></p>
+        <p><a href="/register">Register</a></p>
+    {% endif %}
+</body>
+</html>

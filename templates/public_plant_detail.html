@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Public Plant Detail</title>
+</head>
+<body>
+    <h1>Public Plant Detail</h1>
+
+    <p>
+        <a href="/gallery">Back to Gallery</a> |
+        <a href="/">Home</a>
+    </p>
+
+    <h2>{{ plant.name }}</h2>
+
+    <p><strong>Species:</strong> {{ plant.species }}</p>
+    <p><strong>Type:</strong> {{ plant.plant_type }}</p>
+    <p><strong>Water Frequency:</strong> Every {{ plant.water_frequency_days }} days</p>
+    <p><strong>Sunlight:</strong> {{ plant.sunlight }}</p>
+    <p><strong>Difficulty:</strong> {{ plant.difficulty }}</p>
+    <p><strong>Health Status:</strong> {{ plant.health_status }}</p>
+
+    <h2>General Care Information</h2>
+    <p>This public view provides basic plant information for visitors.</p>
+</body>
+</html>

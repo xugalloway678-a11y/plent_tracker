@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <label>Plant Name:</label><br>
+        <input type="text" name="name" value="{{ plant.name if plant else '' }}"><br><br>
+
+        <label>Species:</label><br>
+        <input type="text" name="species" value="{{ plant.species if plant else '' }}"><br><br>
+
+        <label>Plant Type:</label><br>
+        <select name="plant_type">
+            <option value="indoor" {% if plant and plant.plant_type == 'indoor' %}selected{% endif %}>Indoor</option>
+            <option value="outdoor" {% if plant and plant.plant_type == 'outdoor' %}selected{% endif %}>Outdoor</option>
+        </select><br><br>
+
+        <label>Water Frequency Days:</label><br>
+        <input type="number" name="water_frequency_days" min="1" value="{{ plant.water_frequency_days if plant else '' }}"><br><br>
+
+        <label>Sunlight:</label><br>
+        <select name="sunlight">
+            <option value="Full Sun" {% if plant and plant.sunlight == 'Full Sun' %}selected{% endif %}>Full Sun</option>
+            <option value="Partial Sun" {% if plant and plant.sunlight == 'Partial Sun' %}selected{% endif %}>Partial Sun</option>
+            <option value="Full Shade" {% if plant and plant.sunlight == 'Full Shade' %}selected{% endif %}>Full Shade</option>
+            <option value="Indirect Light" {% if plant and plant.sunlight == 'Indirect Light' %}selected{% endif %}>Indirect Light</option>
+            <option value="Low Light" {% if plant and plant.sunlight == 'Low Light' %}selected{% endif %}>Low Light</option>
+        </select><br><br>
+
+        <label>Difficulty:</label><br>
+        <select name="difficulty">
+            <option value="Easy" {% if plant and plant.difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+            <option value="Moderate" {% if plant and plant.difficulty == 'Moderate' %}selected{% endif %}>Moderate</option>
+            <option value="Challenging" {% if plant and plant.difficulty == 'Challenging' %}selected{% endif %}>Challenging</option>
+        </select><br><br>
+
+        <label>Privacy:</label><br>
+        <select name="is_public">
+            <option value="0" {% if plant and not plant.is_public %}selected{% endif %}>Private</option>
+            <option value="1" {% if plant and plant.is_public %}selected{% endif %}>Public</option>
+        </select><br><br>
+
+        <label>Health Status:</label><br>
+        <select name="health_status">
+            <option value="Healthy" {% if plant and plant.health_status == 'Healthy' %}selected{% endif %}>Healthy</option>
+            <option value="Needs Attention" {% if plant and plant.health_status == 'Needs Attention' %}selected{% endif %}>Needs Attention</option>
+            <option value="Sick" {% if plant and plant.health_status == 'Sick' %}selected{% endif %}>Sick</option>
+        </select><br><br>
+
+        <button type="submit">Save</button>
+        <a href="/my-plants">Cancel</a>
+    </form>
+</body>
+</html>

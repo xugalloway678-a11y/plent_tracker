@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+
+    <p>Welcome, {{ username }}!</p>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <h2>System Overview</h2>
+    <p>Total Gardeners: {{ total_gardeners }}</p>
+    <p>Total Plants: {{ total_plants }}</p>
+
+    <h2>Quick Links</h2>
+    <p><a href="/admin/users">User Management</a></p>
+    <p><a href="/gallery">Public Plant Gallery</a></p>
+    <p><a href="/logout">Logout</a></p>
+</body>
+</html>

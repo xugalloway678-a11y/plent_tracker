@@ -1,0 +1,40 @@
+# Python cache and build output
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+webtest/
+
+# Flask and local environment
+.env
+.env.*
+!.env.example
+instance/
+*.sqlite
+*.sqlite3
+*.db
+
+# User uploads and generated local files
+uploads/
+static/uploads/
+media/
+
+# IDE and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Test and tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
