@@ -1,8 +1,33 @@
+import os
+import uuid
+
 from flask import Flask, render_template, request, redirect, flash, session
+from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from db import get_db_connection
 app = Flask(__name__)
 app.secret_key = "change_this_secret_key"
+app.config["UPLOAD_FOLDER"] = os.path.join("static", "uploads", "plants")
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
+
+ALLOWED_IMAGE_EXTENSIONS = {"jpg", "jpeg", "png", "gif"}
+
+
+def has_selected_file(file_storage):
+    return file_storage and file_storage.filename
+
+
+def allowed_image_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
+
+
+def save_plant_photo(file_storage):
+    extension = file_storage.filename.rsplit(".", 1)[1].lower()
+    filename = secure_filename(f"{uuid.uuid4().hex}.{extension}")
+    upload_folder = app.config["UPLOAD_FOLDER"]
+    os.makedirs(upload_folder, exist_ok=True)
+    file_storage.save(os.path.join(upload_folder, filename))
+    return f"static/uploads/plants/{filename}"
 
 
 @app.route("/")
@@ -268,9 +293,14 @@ def add_plant():
         difficulty = request.form.get("difficulty")
         is_public = request.form.get("is_public")
         health_status = request.form.get("health_status")
+        photo = request.files.get("photo")
 
         if not all([name, species, plant_type, water_frequency_days, sunlight, difficulty, is_public, health_status]):
             flash("Please fill in all required fields.")
+            return redirect("/plants/add")
+
+        if has_selected_file(photo) and not allowed_image_file(photo.filename):
+            flash("Please upload a JPG, JPEG, PNG, or GIF image.")
             return redirect("/plants/add")
 
         connection = get_db_connection()
@@ -294,6 +324,18 @@ def add_plant():
                 health_status
             )
         )
+
+        plant_id = cursor.lastrowid
+
+        if has_selected_file(photo):
+            file_path = save_plant_photo(photo)
+            cursor.execute(
+                """
+                INSERT INTO plant_photos (plant_id, file_path)
+                VALUES (%s, %s)
+                """,
+                (plant_id, file_path)
+            )
 
         connection.commit()
         cursor.close()
@@ -383,11 +425,18 @@ def edit_plant(plant_id):
         difficulty = request.form.get("difficulty")
         is_public = request.form.get("is_public")
         health_status = request.form.get("health_status")
+        photo = request.files.get("photo")
 
         if not all([name, species, plant_type, water_frequency_days, sunlight, difficulty, is_public, health_status]):
             cursor.close()
             connection.close()
             flash("Please fill in all required fields.")
+            return redirect(f"/plants/{plant_id}/edit")
+
+        if has_selected_file(photo) and not allowed_image_file(photo.filename):
+            cursor.close()
+            connection.close()
+            flash("Please upload a JPG, JPEG, PNG, or GIF image.")
             return redirect(f"/plants/{plant_id}/edit")
 
         cursor.execute(
@@ -417,6 +466,16 @@ def edit_plant(plant_id):
             )
         )
 
+        if has_selected_file(photo):
+            file_path = save_plant_photo(photo)
+            cursor.execute(
+                """
+                INSERT INTO plant_photos (plant_id, file_path)
+                VALUES (%s, %s)
+                """,
+                (plant_id, file_path)
+            )
+
         connection.commit()
         cursor.close()
         connection.close()
@@ -443,11 +502,18 @@ def my_plants():
 
     cursor.execute(
         """
-        SELECT plant_id, name, species, plant_type, water_frequency_days,
-               is_public, health_status
-        FROM plants
-        WHERE gardener_id = %s
-        ORDER BY created_at DESC
+        SELECT p.plant_id, p.name, p.species, p.plant_type, p.water_frequency_days,
+               p.is_public, p.health_status,
+               (
+                   SELECT pp.file_path
+                   FROM plant_photos pp
+                   WHERE pp.plant_id = p.plant_id
+                   ORDER BY pp.uploaded_at DESC, pp.photo_id DESC
+                   LIMIT 1
+               ) AS thumbnail_path
+        FROM plants p
+        WHERE p.gardener_id = %s
+        ORDER BY p.created_at DESC
         """,
         (session.get("user_id"),)
     )
@@ -499,13 +565,25 @@ def plant_detail(plant_id):
     )
     activities = cursor.fetchall()
 
+    cursor.execute(
+        """
+        SELECT photo_id, file_path, caption, uploaded_at
+        FROM plant_photos
+        WHERE plant_id = %s
+        ORDER BY uploaded_at DESC, photo_id DESC
+        """,
+        (plant_id,)
+    )
+    photos = cursor.fetchall()
+
     cursor.close()
     connection.close()
 
     return render_template(
         "plant_detail.html",
         plant=plant,
-        activities=activities
+        activities=activities,
+        photos=photos
     )
 
 @app.route("/plants/<int:plant_id>/water", methods=["POST"])
@@ -608,29 +686,37 @@ def gallery():
     difficulty = request.args.get("difficulty", "").strip()
 
     query = """
-        SELECT plant_id, name, species, plant_type, sunlight, difficulty, health_status
-        FROM plants
-        WHERE is_public = 1
+        SELECT p.plant_id, p.name, p.species, p.plant_type, p.sunlight,
+               p.difficulty, p.health_status,
+               (
+                   SELECT pp.file_path
+                   FROM plant_photos pp
+                   WHERE pp.plant_id = p.plant_id
+                   ORDER BY pp.uploaded_at DESC, pp.photo_id DESC
+                   LIMIT 1
+               ) AS thumbnail_path
+        FROM plants p
+        WHERE p.is_public = 1
     """
     params = []
 
     if search:
-        query += " AND name LIKE %s"
+        query += " AND p.name LIKE %s"
         params.append(f"%{search}%")
 
     if plant_type:
-        query += " AND plant_type = %s"
+        query += " AND p.plant_type = %s"
         params.append(plant_type)
 
     if sunlight:
-        query += " AND sunlight = %s"
+        query += " AND p.sunlight = %s"
         params.append(sunlight)
 
     if difficulty:
-        query += " AND difficulty = %s"
+        query += " AND p.difficulty = %s"
         params.append(difficulty)
 
-    query += " ORDER BY created_at DESC"
+    query += " ORDER BY p.created_at DESC"
 
     connection = get_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -667,6 +753,20 @@ def public_plant_detail(plant_id):
 
     plant = cursor.fetchone()
 
+    if plant:
+        cursor.execute(
+            """
+            SELECT photo_id, file_path, caption, uploaded_at
+            FROM plant_photos
+            WHERE plant_id = %s
+            ORDER BY uploaded_at DESC, photo_id DESC
+            """,
+            (plant_id,)
+        )
+        photos = cursor.fetchall()
+    else:
+        photos = []
+
     cursor.close()
     connection.close()
 
@@ -674,10 +774,16 @@ def public_plant_detail(plant_id):
         flash("Public plant not found.")
         return redirect("/gallery")
 
-    return render_template("public_plant_detail.html", plant=plant)
+    return render_template("public_plant_detail.html", plant=plant, photos=photos)
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template("404.html"), 404
+
+
+@app.errorhandler(413)
+def file_too_large(error):
+    flash("The uploaded image is too large. Please choose an image under 5 MB.")
+    return redirect(request.referrer or "/my-plants")
 
 
 

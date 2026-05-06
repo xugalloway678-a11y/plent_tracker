@@ -17,7 +17,7 @@
         {% endif %}
     {% endwith %}
 
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         <label>Plant Name:</label><br>
         <input type="text" name="name" value="{{ plant.name if plant else '' }}"><br><br>
 
@@ -62,8 +62,35 @@
             <option value="Sick" {% if plant and plant.health_status == 'Sick' %}selected{% endif %}>Sick</option>
         </select><br><br>
 
+        <label>Photo:</label><br>
+        <input type="file" id="photo-input" name="photo" accept="image/*" style="display:none;">
+        <button type="button" id="photo-button">Choose File</button>
+        <span id="photo-name">No file selected</span><br>
+        {% if plant %}
+            <small>Upload a new photo to add it to this plant's gallery.</small><br>
+        {% endif %}
+        <br>
+
         <button type="submit">Save</button>
         <a href="/my-plants">Cancel</a>
     </form>
+
+    <script>
+        const photoInput = document.getElementById("photo-input");
+        const photoButton = document.getElementById("photo-button");
+        const photoName = document.getElementById("photo-name");
+
+        photoButton.addEventListener("click", function () {
+            photoInput.click();
+        });
+
+        photoInput.addEventListener("change", function () {
+            if (photoInput.files.length > 0) {
+                photoName.textContent = photoInput.files[0].name;
+            } else {
+                photoName.textContent = "No file selected";
+            }
+        });
+    </script>
 </body>
 </html>

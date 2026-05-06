@@ -40,6 +40,18 @@
         {% endif %}
     </p>
 
+    <h2>Photo Gallery</h2>
+
+    {% if photos %}
+        <div>
+            {% for photo in photos %}
+                <img src="/{{ photo.file_path }}" alt="Photo of {{ plant.name }}" width="180" style="margin: 5px;">
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No photos uploaded yet.</p>
+    {% endif %}
+
     <h2>Quick Action</h2>
 
     <form method="POST" action="/plants/{{ plant.plant_id }}/water">

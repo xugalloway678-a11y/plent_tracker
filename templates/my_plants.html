@@ -29,6 +29,7 @@
         <table border="1" cellpadding="8">
             <tr>
                 <th>Name</th>
+                <th>Photo</th>
                 <th>Species</th>
                 <th>Type</th>
                 <th>Health Status</th>
@@ -40,6 +41,13 @@
             {% for plant in plants %}
             <tr>
                 <td>{{ plant.name }}</td>
+                <td>
+                    {% if plant.thumbnail_path %}
+                        <img src="/{{ plant.thumbnail_path }}" alt="Photo of {{ plant.name }}" width="90">
+                    {% else %}
+                        No photo
+                    {% endif %}
+                </td>
                 <td>{{ plant.species }}</td>
                 <td>{{ plant.plant_type }}</td>
                 <td>{{ plant.health_status }}</td>

@@ -21,6 +21,18 @@
     <p><strong>Difficulty:</strong> {{ plant.difficulty }}</p>
     <p><strong>Health Status:</strong> {{ plant.health_status }}</p>
 
+    <h2>Photos</h2>
+
+    {% if photos %}
+        <div>
+            {% for photo in photos %}
+                <img src="/{{ photo.file_path }}" alt="Photo of {{ plant.name }}" width="180" style="margin: 5px;">
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No photos uploaded yet.</p>
+    {% endif %}
+
     <h2>General Care Information</h2>
     <p>This public view provides basic plant information for visitors.</p>
 </body>

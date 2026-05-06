@@ -55,6 +55,11 @@
             {% for plant in plants %}
                 <div style="border: 1px solid #333; padding: 10px; margin: 10px;">
                     <h3>{{ plant.name }}</h3>
+                    {% if plant.thumbnail_path %}
+                        <img src="/{{ plant.thumbnail_path }}" alt="Photo of {{ plant.name }}" width="160">
+                    {% else %}
+                        <p>No photo</p>
+                    {% endif %}
                     <p><strong>Species:</strong> {{ plant.species }}</p>
                     <p><strong>Type:</strong> {{ plant.plant_type }}</p>
                     <p><strong>Sunlight:</strong> {{ plant.sunlight }}</p>
